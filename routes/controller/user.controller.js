@@ -40,6 +40,9 @@ router.post('/login', validate.validateLogin(), function(req, res, next){
     } else {
       return res.status(422).json(info);
     }
+
+    
+
   })(req, res, next);
 });
 
