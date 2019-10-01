@@ -1,13 +1,15 @@
-var mongoose = require('mongoose');
 var router = require('express').Router();
 var passport = require('passport');
-var User = mongoose.model('User');
 var auth = require('../auth');
 var userService = require('../../services/user.services');
+var { logger } = require('../../utility/logger');
+var {validationResult} = require('express-validator/check');
+var {validate} = require('../../utility/user.validation');
 
 router.get('/getUserById', auth.required, function(req, res, next){
   userService.getUserById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
+
     return res.json({user: userService.toAuthJSON(user)});
   }).catch(next);
 });
@@ -15,17 +17,17 @@ router.get('/getUserById', auth.required, function(req, res, next){
 router.put('/updateUser', auth.required, function(req, res, next){
   userService.updateUser(req).then(function(user){
     if(!user){ return res.sendStatus(401); }
+
     return res.json({user: userService.toAuthJSON(user)});
   }).catch(next);
 });
 
-router.post('/login', function(req, res, next){
-  if(!req.body.user.email){
-    return res.status(422).json({errors: {email: "can't be blank"}});
-  }
-
-  if(!req.body.user.password){
-    return res.status(422).json({errors: {password: "can't be blank"}});
+router.post('/login', validate.validateLogin(), function(req, res, next){
+  const errors = validationResult(req);
+  console.log(errors);
+  if (!errors.isEmpty()) {
+    res.status(422).json({ errors: errors.array() });
+    return;
   }
 
   passport.authenticate('local', {session: false}, function(err, user, info){
@@ -40,7 +42,15 @@ router.post('/login', function(req, res, next){
   })(req, res, next);
 });
 
-router.post('/registerUser', function(req, res, next){
+router.post('/registerUser', validate.validateRegisterUser(), function(req, res, next){
+  console.log(req.body);
+  const errors = validationResult(req);
+  console.log(errors);
+  if (!errors.isEmpty()) {
+    res.status(422).json({ errors: errors.array() });
+    return;
+  }
+
   userService.registerUser(req.body.user).then(function(user){
     return res.json({user: userService.toAuthJSON(user)});
   }).catch(next);

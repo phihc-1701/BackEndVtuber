@@ -4,6 +4,7 @@ var express = require('express'),
     cors = require('cors'),
     errorhandler = require('errorhandler'),
     mongoose = require('mongoose');
+    require('dotenv').config();
 
 var isProduction = process.env.NODE_ENV === 'production';
 

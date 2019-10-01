@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports = {
-  secretKey: process.env.NODE_ENV === 'production' ? process.env.SECRET : 'secret'
+  secretKey: process.env.SECRET
 };
