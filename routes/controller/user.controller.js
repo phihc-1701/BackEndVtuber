@@ -24,7 +24,7 @@ router.put('/updateUser', auth.required, function(req, res, next){
 
 router.post('/login', validate.validateLogin(), function(req, res, next){
   const errors = validationResult(req);
-  console.log(errors);
+
   if (!errors.isEmpty()) {
     res.status(422).json({ errors: errors.array() });
     return;
@@ -34,6 +34,7 @@ router.post('/login', validate.validateLogin(), function(req, res, next){
     if(err){ return next(err); }
 
     if(user){
+      logger.logVtuberApi.info('function login successful');
       user.token = userService.generateJWT(user);
       return res.json({user: userService.toAuthJSON(user)});
     } else {
@@ -43,9 +44,8 @@ router.post('/login', validate.validateLogin(), function(req, res, next){
 });
 
 router.post('/registerUser', validate.validateRegisterUser(), function(req, res, next){
-  console.log(req.body);
   const errors = validationResult(req);
-  console.log(errors);
+
   if (!errors.isEmpty()) {
     res.status(422).json({ errors: errors.array() });
     return;

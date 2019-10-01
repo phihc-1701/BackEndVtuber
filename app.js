@@ -4,6 +4,7 @@ var express = require('express'),
     cors = require('cors'),
     errorhandler = require('errorhandler'),
     mongoose = require('mongoose');
+    var { logger } = require('./utility/logger');
     require('dotenv').config();
 
 var isProduction = process.env.NODE_ENV === 'production';
@@ -37,6 +38,7 @@ app.use(require('./routes'));
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
+  logger.logVtuberApi.error(`url: ${req.originalUrl} Not Found`);
   next(err);
 });
 
@@ -47,7 +49,7 @@ app.use(function(req, res, next) {
 if (!isProduction) {
   app.use(function(err, req, res, next) {
     console.log(err.stack);
-
+    logger.logVtuberApi.error(err.stack);
     res.status(err.status || 500);
 
     res.json({'errors': {
@@ -61,6 +63,7 @@ if (!isProduction) {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
+  logger.logVtuberApi.error(err.message);
   res.json({'errors': {
     message: err.message,
     error: {}
@@ -69,5 +72,6 @@ app.use(function(err, req, res, next) {
 
 // finally, let's start our server...
 var server = app.listen( process.env.PORT || 3000, function(){
-  console.log('Listening on port ' + server.address().port);
+  logger.logVtuberApi.info(`Listening on port ${server.address().port}`);
+  console.log(`Listening on port ${server.address().port}`);
 });
