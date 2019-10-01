@@ -26,14 +26,9 @@ if (!isProduction) {
   app.use(errorhandler());
 }
 
-if(isProduction){
-  mongoose.connect(process.env.MONGODB_URI);
-} else {
-  mongoose.connect('mongodb://localhost/vtuber');
-  mongoose.set('debug', true);
-}
+mongoose.connect(process.env.MONGODB_URI);
 
-require('./models/User');
+require('./models');
 require('./config/passport');
 
 app.use(require('./routes'));
