@@ -7,6 +7,7 @@ var {validationResult} = require('express-validator/check');
 var {validate} = require('../../utility/user.validation');
 
 router.get('/getUserById', auth.required, function(req, res, next){
+  console.log(req.payload);
   userService.getUserById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
 
