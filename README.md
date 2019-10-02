@@ -1,15 +1,19 @@
 1.Instal mongodb : 
    access link: https://docs.mongodb.com/manual/installation/#tutorials
    choose Install MongoDB Community Edition on Windows and install follow steps
+
 2.Open source by Visual Studio Code
+
 3.Crete file .env in folder project, and add infomation config into file .env: (if not yet)
     NODE_ENV=development
     MONGODB_URI=mongodb://localhost/vtuber
     SECRET=demoVtuber
+
 4.Run project on localhost 
     Run command line:
         npm install
         npm run dev
+
 5.Test API.
   Using PostMan.
     URL API: localhost:3000/api/user/registerUser
