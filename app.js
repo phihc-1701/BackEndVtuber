@@ -70,9 +70,10 @@ app.use(function(err, req, res, next) {
   }});
 });
 
+//create io server
 var ioserver = require('./socket')(app);
 // finally, let's start our server...
-var server = app.listen( process.env.PORT || 3000, function(){
+var server = ioserver.listen( process.env.PORT || 3000, function(){
   logger.logVtuberApi.info(`Listening on port ${server.address().port}`);
   console.log(`Listening on port ${server.address().port}`);
 });
