@@ -2,15 +2,15 @@
    access link: https://docs.mongodb.com/manual/installation/#tutorials
    choose Install MongoDB Community Edition on Windows and install follow steps
 
-2.Open source by Visual Studio Code
+2.Open source by Visual Studio Code.
 
-3.Crete file .env in folder project, and add infomation config into file .env: (if not yet)
+3.Crete file .env in folder project, and add infomation config into file .env: (if not yet).
     NODE_ENV=development
     MONGODB_URI=mongodb://localhost/vtuber
     SECRET=demoVtuber
 
-4.Run project on localhost 
-    Run command line:
+4.Run project on localhost. 
+    Run command line (folde of project) :
         npm install
         npm run dev
 
@@ -53,7 +53,8 @@ Application Structure
     config/ - This folder contains configuration for passport as well as a central location for configuration/environment variables.
     routes/ - This folder contains the route definitions for our API.
     models/ - This folder contains the schema definitions for our Mongoose models.
-    services/ - This folder contains the services to hanling business and access Mongodb
+    services/ - This folder contains the services to hanling business and access Mongodb.
+    utility/ - This folder contains the logger and validations.
     .env - const environment available
     
 
