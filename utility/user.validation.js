@@ -1,6 +1,6 @@
 const {check} = require('express-validator/check');
 
-var validateRegisterUser = () => {
+let validateRegisterUser = () => {
   return [ 
     check('user.username', 'username does not exists').not().isEmpty(),
     check('user.username', 'username must be Alphanumeric').isAlphanumeric(),
@@ -12,7 +12,7 @@ var validateRegisterUser = () => {
   ]; 
 }
 
-var validateLogin = () => {
+let validateLogin = () => {
   return [ 
     check('user.email', 'Invalid does not exists').not().isEmpty(),
     check('user.email', 'Invalid email').isEmail(),
@@ -20,7 +20,7 @@ var validateLogin = () => {
   ]; 
 }
 
-var validate = {
+let validate = {
   validateRegisterUser: validateRegisterUser,
   validateLogin: validateLogin
 };

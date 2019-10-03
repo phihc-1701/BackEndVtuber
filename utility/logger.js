@@ -2,13 +2,13 @@ const { createLogger, format, transports } = require('winston');
 const { combine, timestamp, printf } = format;
 require('winston-daily-rotate-file');
 
-var transportApi = new (transports.DailyRotateFile)({
-  filename: 'log/VtuberApi-%DATE%.log',
+let transportApi = new (transports.DailyRotateFile)({
+  filename: 'log/api.%DATE%.log',
   datePattern: 'YYYY-MM-DD'
 });
 
-var transportSocketIO = new (transports.DailyRotateFile)({
-  filename: 'log/VtuberSocketIO-%DATE%.log',
+let transportSocketIO = new (transports.DailyRotateFile)({
+  filename: 'log/socketIo.%DATE%.log',
   datePattern: 'YYYY-MM-DD'
 });
 
@@ -16,7 +16,7 @@ const formatLog = printf(({ level, message, timestamp }) => {
   return `${timestamp} ${level}: ${message}`;
 });
 
-var logVtuberApi = createLogger({
+let api = createLogger({
   format: combine(
     timestamp(),
     formatLog
@@ -26,7 +26,7 @@ var logVtuberApi = createLogger({
     ]
   });
 
-var logVtuberSocketIO = createLogger({
+  let socketIo = createLogger({
   format: combine(
     timestamp(),
     formatLog
@@ -36,9 +36,9 @@ var logVtuberSocketIO = createLogger({
     ]
   });
 
-var logger = {
-  logVtuberApi: logVtuberApi,
-  logVtuberSocketIO: logVtuberSocketIO
+  let logger = {
+  api: api,
+  socketIo: socketIo
 };
 
 module.exports = {logger};

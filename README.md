@@ -11,8 +11,8 @@
 
 4.Run project on localhost 
     Run command line:
-        npm install
-        npm run dev
+        npm install: insall all package dependencies in package.json
+        npm run dev: run app 
 
 5.Test API.
   Using PostMan.

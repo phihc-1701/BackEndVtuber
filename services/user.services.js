@@ -3,17 +3,17 @@ var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 var secret = require('../config').secretKey;
 var dbUser = mongoose.model('User');
-var SEX = require('../constants/common').SEX;
+var CONSTANTS = require('../common/constant').CONSTANTS;
 
-var validPassword = function (password, user) {
-  var hash = crypto.pbkdf2Sync(password, user.salt, 100000, 256, 'sha512').toString('hex');
+let validPassword = function (password, user) {
+  let hash = crypto.pbkdf2Sync(password, user.salt, 100000, 256, 'sha512').toString('hex');
 
   return user.hash === hash;
 };
 
-var encryptPassword = function (password) {
-  var salt = crypto.randomBytes(16).toString('hex');
-  var result = {
+let encryptPassword = function (password) {
+  let salt = crypto.randomBytes(16).toString('hex');
+  let result = {
     salt: salt,
     hash: crypto.pbkdf2Sync(password, salt, 100000, 256, 'sha512').toString('hex')
   };
@@ -21,15 +21,15 @@ var encryptPassword = function (password) {
   return result;
 }
 
-var decryptPassword = function (password, salt) {
-  var hash = crypto.pbkdf2Sync(password, salt, 100000, 256, 'sha512').toString('hex');
+let decryptPassword = function (password, salt) {
+  let hash = crypto.pbkdf2Sync(password, salt, 100000, 256, 'sha512').toString('hex');
 
   return hash;
 }
 
-var generateJWT = function (user) {
-  var today = new Date();
-  var exp = new Date(today);
+let generateJWT = function (user) {
+  let today = new Date();
+  let exp = new Date(today);
   exp.setDate(today.getDate() + 60);
 
   return jwt.sign({
@@ -40,7 +40,7 @@ var generateJWT = function (user) {
 }
 
 
-var toAuthJSON = function (user) {
+let toAuthJSON = function (user) {
   return {
     username: user.username,
     email: user.email,
@@ -55,17 +55,17 @@ var toAuthJSON = function (user) {
   };
 };
 
-var getUserById = function (id) {
+let getUserById = function (id) {
   return dbUser.findById(id);
 }
 
-var registerUser = function (user) {
-  var newUser = new dbUser();
-  var encryptResult = encryptPassword(user.password);
+let registerUser = function (user) {
+  let newUser = new dbUser();
+  let encryptResult = encryptPassword(user.password);
 
   newUser.username = user.username;
   newUser.email = user.email;
-  newUser.sex = SEX.MALE;
+  newUser.sex = CONSTANTS.SEX.MALE;
   newUser.firstName = user.firstName;
   newUser.lastName = user.lastName;
   newUser.birthday = user.birthday;
@@ -80,7 +80,7 @@ var registerUser = function (user) {
   return newUser.save();
 }
 
-var updateUser = function (req) {
+let updateUser = function (req) {
   return dbUser.findById(req.payload.id).then(function (user) {
 
     // only update fields that were actually passed...
@@ -112,7 +112,7 @@ var updateUser = function (req) {
       user.image = req.body.user.image;
     }
     if (typeof req.body.user.password !== 'undefined') {
-      var encryptResult = encryptPassword(req.body.user.password);
+      let encryptResult = encryptPassword(req.body.user.password);
       user.salt = encryptResult.salt;
       user.hash = encryptResult.hash;
     }
@@ -121,7 +121,7 @@ var updateUser = function (req) {
   });
 }
 
-var userService = {
+let userService = {
   decryptPassword: decryptPassword,
   generateJWT: generateJWT,
   toAuthJSON: toAuthJSON,

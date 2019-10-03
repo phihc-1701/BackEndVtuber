@@ -1,1 +1,1 @@
-require('./User');
+require('./user');
