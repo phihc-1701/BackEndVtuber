@@ -1,4 +1,4 @@
-var chatEvents = function (io) {
+var chatSocket = function (io) {
 
     // Chatroom namespace
     var numUsers = 0;
@@ -79,5 +79,5 @@ var getCurrentTime = function () {
   }
 
 module.exports = {
-    chatEvents
+    chatSocket
 };

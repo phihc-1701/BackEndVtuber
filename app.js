@@ -4,6 +4,7 @@ var express = require('express'),
   cors = require('cors'),
   errorhandler = require('errorhandler'),
   mongoose = require('mongoose');
+
 var { logger } = require('./utility/logger');
 require('dotenv').config();
 
@@ -12,9 +13,15 @@ var isProduction = process.env.NODE_ENV === 'production';
 
 // Create global app object uss express framework
 var app = express();
+// Init socket.io
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 
 //Enable cross-origin resource sharing (CORS) with various options.
 app.use(cors());
+
+//add morgan
+app.use(require('morgan')('dev'));
 
 // Parse HTTP request body. See also: body, co-body, and raw-body.
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -35,7 +42,7 @@ if (!isProduction) {
 //Connect mongodb
 mongoose.connect(process.env.MONGODB_URI);
 
-//Require model scheme mongoose
+//Require models scheme mongoose
 require('./models');
 
 //Require passport authentication
@@ -81,10 +88,14 @@ app.use(function (err, req, res, next) {
   });
 });
 
-//create io server
-var ioserver = require('./socket')(app);
-// finally, let's start our server...
-var server = ioserver.listen(process.env.PORT || 3000, function () {
-  logger.api.info(`Listening on port ${server.address().port}`);
-  console.log(`Listening on port ${server.address().port}`);
+//let's start our server...
+let serverInfo = server.listen(process.env.PORT || 3000, function () {
+  logger.api.info(`Server listening on port ${serverInfo.address().port}`);
+  console.log(`Server listening on port ${serverInfo.address().port}`);
 });
+
+//Add services of socket.io
+require('./socket.io')(io);
+
+
+
