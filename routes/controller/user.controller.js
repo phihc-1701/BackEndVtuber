@@ -3,8 +3,8 @@ var passport = require('passport');
 var auth = require('../auth');
 var userService = require('../../services/user.services');
 var { logger } = require('../../utility/logger');
-var { validationResult } = require('express-validator/check');
-var { validate } = require('../../utility/user.validation');
+var {validationResult} = require('express-validator');
+var {validate} = require('../../utility/user.validation');
 
 router.get('/getUserById', auth.required, function (req, res, next) {
   console.log(req.payload);
