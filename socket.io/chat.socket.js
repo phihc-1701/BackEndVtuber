@@ -10,26 +10,26 @@ var chatSocket = function (io) {
 
         // EVENT FOR CHATTING
         // Event send message all
-        socket.on(EVENTS.CLIENT_SENDMESSAGE_ALL, function (data) {
+        socket.on(EVENTS.CLIENT_SENDMESSAGE_ALL, function (message) {
             io.sockets.emit(EVENTS.SERVER_SENDMESSAGE_ALL, {
-                un: socket.Username,
-                nd: data
+                username: socket.Username,
+                message: message
             });
         });
 
         //Event send message in Room
-        socket.on(EVENTS.CLIENT_SENDMESSAGE_ROOM, function (data) {
+        socket.on(EVENTS.CLIENT_SENDMESSAGE_ROOM, function (message) {
             console.log(io.sockets.adapter.rooms);
             io.sockets.in(socket.Phong).emit(EVENTS.SERVER_SENDMESSAGE_ROOM, {
-                un: socket.Username,
-                nd: data
+                username: socket.Username,
+                message: message
             });
         });
 
         //Event user is typing
         socket.on(EVENTS.TYPING_MESSAGE, function () {
-            var s = socket.Username + " is typing...";
-            socket.broadcast.emit(EVENTS.TYPING_MESSAGE, s);
+            var istyping = socket.Username + EVENTS.IS_TYPING;
+            socket.broadcast.emit(EVENTS.TYPING_MESSAGE, istyping);
         });
 
         //Event user is stoping type
@@ -39,8 +39,8 @@ var chatSocket = function (io) {
 
         //Event user is typing in Room
         socket.on(EVENTS.TYPING_MESSAGE_IN_ROOM, function () {
-            var s = socket.Username + " is typing...";
-            socket.broadcast.in(socket.Phong).emit(EVENTS.TYPING_MESSAGE, s);
+            var istyping = socket.Username + EVENTS.IS_TYPING;
+            socket.broadcast.in(socket.Phong).emit(EVENTS.TYPING_MESSAGE, istyping);
         });
 
         //EVENT FROM JOIN/LEAVE ROOM
@@ -86,6 +86,14 @@ var chatSocket = function (io) {
 
         //Event log out
         socket.on(EVENTS.LOGOUT, function () {
+            listUserActived.splice(
+                listUserActived.indexOf(socket.Username), 1
+            );
+            socket.broadcast.emit(EVENTS.SERVER_RESPONSE_LISTUSERS, listUserActived);
+        });
+
+        //Event handle disconnect when user disconnected
+        socket.on(EVENTS.DISCONNECTED, () => {
             listUserActived.splice(
                 listUserActived.indexOf(socket.Username), 1
             );

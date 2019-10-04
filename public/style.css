@@ -35,6 +35,7 @@ body{background-color: #ebeef4}
 
 #txtMessage{
     background-color: transparent; 
-    border: solid 1px black
+    border: solid 1px black;
+    width: 44%;
 }
 

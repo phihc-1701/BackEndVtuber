@@ -18,7 +18,7 @@ socket.on("SERVER_REGISTER_SUCCESS", function (data) {
 });
 
 socket.on("SERVER_SENDMESSAGE_ALL", function (data) {
-  $("#listMessages").append("<div class='ms'>" + data.un + ":" + data.nd + "</div>");
+  $("#listMessages").append("<div class='ms'>" + data.username + ":" + data.message + "</div>");
 });
 
 socket.on("TYPING_MESSAGE", function (data) {
@@ -34,7 +34,7 @@ socket.on("CURRENT_ROOM", function (data) {
 });
 
 socket.on("SERVER_SENDMESSAGE_ROOM", function (data) {
-  $("#listMessages").append("<div class='ms'>" + data.un + ":" + data.nd + "</div>");
+  $("#listMessages").append("<div class='ms'>" + data.username + ":" + data.message + "</div>");
 });
 
 socket.on('SEND_POSTURE', (data) => {
@@ -44,7 +44,7 @@ socket.on('SEND_POSTURE', (data) => {
 });
 
 socket.on('disconnect', () => {
-  $("#listMessages").append("<div class='ms'>" + 'You have been disconnected' + "</div>");
+  $("#listMessages").append("<div class='ms'>" + 'You have been disconnected' + "</div>");  
 });
 
 socket.on('reconnect', () => {
@@ -52,7 +52,7 @@ socket.on('reconnect', () => {
 });
 
 socket.on('reconnect_error', () => {
-  $("#listMessages").append("<div class='ms'>" + 'Attempt to reconnect has failed' + "</div>");  
+  $("#listMessages").append("<div class='ms'>" + 'Attempt to reconnect has failed' + "</div>");
 });
 
 const getCurrentTime = () => {
@@ -60,6 +60,19 @@ const getCurrentTime = () => {
   var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
   var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
   return ' ' + time;
+}
+
+const sendMessageAll = () => {
+
+  var currentRoom = $(".currentRoom").text();
+  var message = $("#txtMessage").val().trim();
+  if (currentRoom === "All") {
+    socket.emit("CLIENT_SENDMESSAGE_ALL", message);
+  } else {
+    socket.emit("CLIENT_SENDMESSAGE_ROOM", message);
+  }
+
+  $("#txtMessage").val("");
 }
 
 $(document).ready(function () {
@@ -94,15 +107,13 @@ $(document).ready(function () {
     $("#loginForm").show(1000);
   });
 
-  $("#btnSendMessage").click(function () {
+  $("#txtMessage").keydown(function () {
+    if (event.which === 13)
+      sendMessageAll();
+  });
 
-    var currentRoom = $(".currentRoom").text();
-    var message = $("#txtMessage").val();
-    if (currentRoom === "All") {
-      socket.emit("CLIENT_SENDMESSAGE_ALL", message);
-    } else {
-      socket.emit("CLIENT_SENDMESSAGE_ROOM", message);
-    }
+  $("#btnSendMessage").click(function () {
+    sendMessageAll();
   });
 
   $("#btnCreateRoom").click(function () {
