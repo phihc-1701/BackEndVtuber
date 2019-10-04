@@ -1,30 +1,70 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Socket.IO Chat Example</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <ul class="pages">
-    <li class="chat page">
-      <div class="chatArea">
-        <ul class="messages"></ul>
-      </div>
-      <input class="inputMessage" placeholder="Type here..."/>
-    </li>
-    <li class="login page">
-      <div class="form">
-        <h3 class="title">User Name:</h3>
-        <input class="usernameInput" type="text" maxlength="14" />
-        <h3 class="title">Token:</h3>
-        <input class="tokenInput" type="text" maxlength="200" />
-      </div>
-    </li>
-  </ul>
+<!DOCTYPE html>
+<html>
 
-  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/main.js"></script>
+<head>
+    <meta charset="utf-8">
+    <title>Demo Chat</title>
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="main.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <div id="loginForm">
+            <h3>Input Username</h3>
+            <input type="text" id="txtUsername" />
+            <input type="button" value="Register" id="btnRegister" />
+            <div>
+                <h3 class="title">Role:</h3>
+                <select name="role" id="roles">
+                    <option value="1" selected>Admin</option>
+                    <option value="2">User</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="chatForm">
+            <div id="left">
+                <div id="boxTitle">Users Online</div>
+                <div id="boxContent"></div>
+            </div>
+            <div id="right">
+                <div id="sayHi">
+                    Hello <span id="currentUser"></span>
+                    <input type="button" id="btnLogout" value="Logout">
+                </div>
+                <div class="createRooms">
+                    <input type="button" id="btnCreateRoom" value="Create room">
+                    <input type="text" id="txtRoom" />
+                    <input type="button" id="btnLeaveRoom" value="Leave room">
+                </div>
+
+                <div>Current Room: <span class="currentRoom">All</span></div>
+
+                <div class="messages">
+                    <div id="listMessages">
+                    </div>
+                    <div id="postureMessage">
+                    </div>
+                </div>
+
+                <div id="notification"></div>
+
+                <input type="text" id="txtMessage" />
+                <input type="button" id="btnSendMessage" value="Send Chat" />
+                <input type="button" id="btnAutoSendPosture" value="Auto Send Posture Message" />
+                <input type="button" id="btnStopPosture" value="Stop Posture Message" />
+
+            </div>
+        </div>
+
+    </div>
+
 </body>
+
 </html>
