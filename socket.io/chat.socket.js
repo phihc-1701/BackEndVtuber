@@ -1,104 +1,95 @@
+var EVENTS = require('../common/constant').CONSTANTS.SOCKET_EVENTS;
+
 var chatSocket = function (io) {
 
-    var arrayUsers = [];
+    var listUserActived = [];
 
-    // Chatroom namespace
-    var numUsers = 0;
-    io.on('connection', (socket) => {
-        var addedUser = false;       
+    io.on(EVENTS.CONNECTION, (socket) => {
         socket.RoomName = socket.id;
         var listRooms = [];
 
-        socket.on("client-send-Username", function (data) {
-            if (arrayUsers.indexOf(data) >= 0) {
-                socket.emit("server-send-register-fail");
-            } else {
-                arrayUsers.push(data);
-                socket.Username = data;
-                socket.emit("server-send-register-successed", data);
-                io.sockets.emit("server-send-listUser", arrayUsers);
-            }
-        });
-        socket.on("logout", function () {
-            arrayUsers.splice(
-                arrayUsers.indexOf(socket.Username), 1
-            );
-            socket.broadcast.emit("server-send-listUser", arrayUsers);
-        });
-
-        socket.on("user-send-message", function (data) {
-            io.sockets.emit("server-send-mesage", {
+        // EVENT FOR CHATTING
+        // Event send message all
+        socket.on(EVENTS.CLIENT_SENDMESSAGE_ALL, function (data) {
+            io.sockets.emit(EVENTS.SERVER_SENDMESSAGE_ALL, {
                 un: socket.Username,
                 nd: data
             });
         });
 
-        socket.on("typing message", function () {
-            var s = socket.Username + " is typing...";
-            socket.broadcast.emit("had typing", s);
-        });
-
-        socket.on("stop typing", function () {
-            io.sockets.emit("who stop typing");
-        });
-
-        socket.on("typing in Room", function () {
-            var s = socket.Username + " is typing...";
-            //socket.broadcast.emit("had typing", s);
-            socket.broadcast.in(socket.Phong).emit("had typing", s);
-        });
-
-        // when the user disconnects.. perform this
-        socket.on('disconnect', () => {
-            if (addedUser) {
-                --numUsers;
-                // echo globally that this client has left
-                socket.broadcast.emit('user left', {
-                    username: socket.username,
-                    numUsers: numUsers
-                });
-            }
-        });
-
-        //Test connection
-        socket.on('test connection', () => {
-            console.log('connect successful');
-        });
-
-        socket.on('auto connect', (data) => {
-            var currentTime = getCurrentTime();
-            io.sockets.emit('test connection', {
-                currentTime: currentTime,
-                posture: data.posture
+        //Event send message in Room
+        socket.on(EVENTS.CLIENT_SENDMESSAGE_ROOM, function (data) {
+            console.log(io.sockets.adapter.rooms);
+            io.sockets.in(socket.Phong).emit(EVENTS.SERVER_SENDMESSAGE_ROOM, {
+                un: socket.Username,
+                nd: data
             });
         });
 
-        //Create room
-        socket.on("create room", function (data) {
+        //Event user is typing
+        socket.on(EVENTS.TYPING_MESSAGE, function () {
+            var s = socket.Username + " is typing...";
+            socket.broadcast.emit(EVENTS.TYPING_MESSAGE, s);
+        });
+
+        //Event user is stoping type
+        socket.on(EVENTS.STOP_TYPING_MESSAGE, function () {
+            io.sockets.emit(EVENTS.STOP_TYPING_MESSAGE);
+        });
+
+        //Event user is typing in Room
+        socket.on(EVENTS.TYPING_MESSAGE_IN_ROOM, function () {
+            var s = socket.Username + " is typing...";
+            socket.broadcast.in(socket.Phong).emit(EVENTS.TYPING_MESSAGE, s);
+        });
+
+        //EVENT FROM JOIN/LEAVE ROOM
+        //Event join room
+        socket.on(EVENTS.JOIN_ROOM, function (data) {
             socket.join(data);
             socket.Phong = data;
 
             if (!listRooms.includes(data)) {
                 listRooms.push(data);
             }
-
-            io.sockets.emit("server-send-rooms", listRooms);
-            socket.emit("current room", data);
+            socket.emit(EVENTS.CURRENT_ROOM, data);
 
         });
 
-        //Leave room
-        socket.on("leave room", function (data) {
+        //Event Leave room
+        socket.on(EVENTS.LEAVE_ROOM, function (data) {
             socket.leave(data);
         });
 
-        //chat in room
-        socket.on("chatRoom", function (data) {
-            console.log(io.sockets.adapter.rooms);
-            io.sockets.in(socket.Phong).emit("serverChatRoom", {
-                un: socket.Username,
-                nd: data
+        //Event send posture messge
+        socket.on(EVENTS.SEND_POSTURE, (data) => {
+            var currentTime = getCurrentTime();
+            io.sockets.emit(EVENTS.SEND_POSTURE, {
+                currentTime: currentTime,
+                posture: data.posture
             });
+        });
+
+        //EVENT FOR UTILITY
+
+        //Event registration
+        socket.on(EVENTS.CLIENT_REGISTRATION, function (data) {
+            if (listUserActived.indexOf(data) >= 0) {
+                socket.emit(EVENTS.SERVER_REGISTER_FAIL);
+            } else {
+                listUserActived.push(data);
+                socket.Username = data;
+                socket.emit(EVENTS.SERVER_REGISTER_SUCCESS, data);
+                io.sockets.emit(EVENTS.SERVER_RESPONSE_LISTUSERS, listUserActived);
+            }
+        });
+
+        //Event log out
+        socket.on(EVENTS.LOGOUT, function () {
+            listUserActived.splice(
+                listUserActived.indexOf(socket.Username), 1
+            );
+            socket.broadcast.emit(EVENTS.SERVER_RESPONSE_LISTUSERS, listUserActived);
         });
     });
 }

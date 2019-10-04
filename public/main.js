@@ -1,43 +1,43 @@
 var socket = io("http://localhost:3000");
 
-socket.on("server-send-register-fail", function () {
+socket.on("SERVER_REGISTER_FAIL", function () {
   alert("User has been register !");
 });
 
-socket.on("server-send-listUser", function (data) {
+socket.on("SERVER_RESPONSE_LISTUSERS", function (data) {
   $("#boxContent").html("");
   data.forEach(function (i) {
     $("#boxContent").append("<div class='user'>" + i + "</div>");
   });
 });
 
-socket.on("server-send-register-successed", function (data) {
+socket.on("SERVER_REGISTER_SUCCESS", function (data) {
   $("#currentUser").html(data);
   $("#loginForm").hide(2000);
   $("#chatForm").show(1000);
 });
 
-socket.on("server-send-mesage", function (data) {
+socket.on("SERVER_SENDMESSAGE_ALL", function (data) {
   $("#listMessages").append("<div class='ms'>" + data.un + ":" + data.nd + "</div>");
 });
 
-socket.on("had typing", function (data) {
+socket.on("TYPING_MESSAGE", function (data) {
   $("#notification").html("<img width='20px' src='typing05.gif'> " + data);
 });
 
-socket.on("who stop typing", function () {
+socket.on("STOP_TYPING_MESSAGE", function () {
   $("#notification").html("");
 });
 
-socket.on("current room", function (data) {
+socket.on("CURRENT_ROOM", function (data) {
   $(".currentRoom").html(data);
 });
 
-socket.on("serverChatRoom", function (data) {
+socket.on("SERVER_SENDMESSAGE_ROOM", function (data) {
   $("#listMessages").append("<div class='ms'>" + data.un + ":" + data.nd + "</div>");
 });
 
-socket.on('test connection', (data) => {
+socket.on('SEND_POSTURE', (data) => {
   $("#postureMessage").append("<div class='ms'>" + "Server receive message " + data.currentTime + "</div>");
   $("#postureMessage").append("<div class='ms'>" + "Data:  " + data.posture + "</div>");
   $("#postureMessage").append("<div class='ms'>" + "Client stop emit " + getCurrentTime() + "</div>");
@@ -70,26 +70,26 @@ $(document).ready(function () {
   $("#txtMessage").focusin(function () {
     var currentRoom = $(".currentRoom").text();
     if (currentRoom === "All") {
-      socket.emit("typing message");
+      socket.emit("TYPING_MESSAGE");
     } else {
-      socket.emit("typing in Room");
+      socket.emit("TYPING_MESSAGE_IN_ROOM");
     }
 
   })
 
   $("#txtMessage").focusout(function () {
-    socket.emit("stop typing");
+    socket.emit("STOP_TYPING_MESSAGE");
   })
 
   $("#btnRegister").click(function () {
     var role = $('#roles option:selected').text();
     if (role === "User")
       $("#btnCreateRoom").val("Join Room");
-    socket.emit("client-send-Username", $("#txtUsername").val());
+    socket.emit("CLIENT_REGISTRATION", $("#txtUsername").val());
   });
 
   $("#btnLogout").click(function () {
-    socket.emit("logout");
+    socket.emit("LOGOUT");
     $("#chatForm").hide(2000);
     $("#loginForm").show(1000);
   });
@@ -99,18 +99,18 @@ $(document).ready(function () {
     var currentRoom = $(".currentRoom").text();
     var message = $("#txtMessage").val();
     if (currentRoom === "All") {
-      socket.emit("user-send-message", message);
+      socket.emit("CLIENT_SENDMESSAGE_ALL", message);
     } else {
-      socket.emit("chatRoom", message);
+      socket.emit("CLIENT_SENDMESSAGE_ROOM", message);
     }
   });
 
   $("#btnCreateRoom").click(function () {
-    socket.emit("create room", $("#txtRoom").val());
+    socket.emit("JOIN_ROOM", $("#txtRoom").val());
   });
 
   $("#btnLeaveRoom").click(function () {
-    socket.emit("leave room", $("#txtRoom").val());
+    socket.emit("LEAVE_ROOM", $("#txtRoom").val());
     $(".currentRoom").html("All");
   });
 
@@ -143,7 +143,7 @@ $(document).ready(function () {
 
     interval = setInterval(function () {
       $("#postureMessage").append("<div class='ms'>" + "Client start emit " + getCurrentTime() + "</div>");
-      socket.emit('auto connect', posture);
+      socket.emit('SEND_POSTURE', posture);
     }, 100);
 
   });
