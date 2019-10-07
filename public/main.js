@@ -1,6 +1,6 @@
 var socket = io("http://localhost:3000");
 
-socket.on("SERVER_REGISTER_FAIL", function () {
+socket.on("INIT_CONNECTION_EXIST", function () {
   alert("User has been register !");
 });
 
@@ -11,13 +11,13 @@ socket.on("SERVER_RESPONSE_LISTUSERS", function (data) {
   });
 });
 
-socket.on("SERVER_REGISTER_SUCCESS", function (data) {
+socket.on("INIT_CONNECTION_SUCCESS", function (data) {
   $("#currentUser").html(data);
   $("#loginForm").hide(2000);
   $("#chatForm").show(1000);
 });
 
-socket.on("SERVER_SENDMESSAGE_ALL", function (data) {
+socket.on("SEND_MESSAGE", function (data) {
   $("#listMessages").append("<div class='ms'>" + data.username + ":" + data.message + "</div>");
 });
 
@@ -67,9 +67,9 @@ const sendMessageAll = () => {
   var currentRoom = $(".currentRoom").text();
   var message = $("#txtMessage").val().trim();
   if (currentRoom === "All") {
-    socket.emit("CLIENT_SENDMESSAGE_ALL", message);
+    socket.emit("SEND_MESSAGE", {message: message});
   } else {
-    socket.emit("CLIENT_SENDMESSAGE_ROOM", message);
+    socket.emit("CLIENT_SENDMESSAGE_ROOM", {message: message});
   }
 
   $("#txtMessage").val("");
@@ -98,7 +98,7 @@ $(document).ready(function () {
     var role = $('#roles option:selected').text();
     if (role === "User")
       $("#btnCreateRoom").val("Join Room");
-    socket.emit("CLIENT_REGISTRATION", $("#txtUsername").val());
+    socket.emit("INIT_CONNECTION", {username: $("#txtUsername").val()});
   });
 
   $("#btnLogout").click(function () {
