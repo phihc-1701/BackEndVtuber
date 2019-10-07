@@ -44,7 +44,7 @@ socket.on('SEND_POSTURE', (data) => {
 });
 
 socket.on('disconnect', () => {
-  $("#listMessages").append("<div class='ms'>" + 'You have been disconnected' + "</div>");  
+  $("#listMessages").append("<div class='ms'>" + 'You have been disconnected' + "</div>");
 });
 
 socket.on('reconnect', () => {
@@ -67,9 +67,9 @@ const sendMessageAll = () => {
   var currentRoom = $(".currentRoom").text();
   var message = $("#txtMessage").val().trim();
   if (currentRoom === "All") {
-    socket.emit("CLIENT_SENDMESSAGE_ALL", message);
+    socket.emit("CLIENT_SENDMESSAGE_ALL", { message });
   } else {
-    socket.emit("CLIENT_SENDMESSAGE_ROOM", message);
+    socket.emit("CLIENT_SENDMESSAGE_ROOM", { message });
   }
 
   $("#txtMessage").val("");
@@ -96,9 +96,10 @@ $(document).ready(function () {
 
   $("#btnRegister").click(function () {
     var role = $('#roles option:selected').text();
+    var userName = $("#txtUsername").val();
     if (role === "User")
       $("#btnCreateRoom").val("Join Room");
-    socket.emit("CLIENT_REGISTRATION", $("#txtUsername").val());
+    socket.emit("CLIENT_REGISTRATION", { userName });
   });
 
   $("#btnLogout").click(function () {
@@ -154,7 +155,7 @@ $(document).ready(function () {
 
     interval = setInterval(function () {
       $("#postureMessage").append("<div class='ms'>" + "Client start emit " + getCurrentTime() + "</div>");
-      socket.emit('SEND_POSTURE', posture);
+      socket.emit('SEND_POSTURE', { posture });
     }, 100);
 
   });

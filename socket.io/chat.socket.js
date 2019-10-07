@@ -10,19 +10,19 @@ var chatSocket = function (io) {
 
         // EVENT FOR CHATTING
         // Event send message all
-        socket.on(EVENTS.CLIENT_SENDMESSAGE_ALL, function (message) {
+        socket.on(EVENTS.CLIENT_SENDMESSAGE_ALL, function (data) {
             io.sockets.emit(EVENTS.SERVER_SENDMESSAGE_ALL, {
                 username: socket.Username,
-                message: message
+                message: data.message
             });
         });
 
         //Event send message in Room
-        socket.on(EVENTS.CLIENT_SENDMESSAGE_ROOM, function (message) {
+        socket.on(EVENTS.CLIENT_SENDMESSAGE_ROOM, function (data) {
             console.log(io.sockets.adapter.rooms);
             io.sockets.in(socket.Phong).emit(EVENTS.SERVER_SENDMESSAGE_ROOM, {
                 username: socket.Username,
-                message: message
+                message: data.message
             });
         });
 
@@ -74,12 +74,12 @@ var chatSocket = function (io) {
 
         //Event registration
         socket.on(EVENTS.CLIENT_REGISTRATION, function (data) {
-            if (listUserActived.indexOf(data) >= 0) {
+            if (listUserActived.indexOf(data.userName) >= 0) {
                 socket.emit(EVENTS.SERVER_REGISTER_FAIL);
             } else {
-                listUserActived.push(data);
-                socket.Username = data;
-                socket.emit(EVENTS.SERVER_REGISTER_SUCCESS, data);
+                listUserActived.push(data.userName);
+                socket.Username = data.userName;
+                socket.emit(EVENTS.SERVER_REGISTER_SUCCESS, data.userName);
                 io.sockets.emit(EVENTS.SERVER_RESPONSE_LISTUSERS, listUserActived);
             }
         });
