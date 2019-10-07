@@ -13,9 +13,9 @@ var isProduction = process.env.NODE_ENV === 'production';
 
 // Create global app object uss express framework
 var app = express();
-// Init socket.io
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
+// version express 4.x no need require('http')
+//var server = require('http').Server(app);
+
 
 //Enable cross-origin resource sharing (CORS) with various options.
 app.use(cors());
@@ -89,10 +89,12 @@ app.use(function (err, req, res, next) {
 });
 
 //let's start our server...
-let serverInfo = server.listen(process.env.PORT || 3000, function () {
-  logger.api.info(`Server listening on port ${serverInfo.address().port}`);
-  console.log(`Server listening on port ${serverInfo.address().port}`);
+let server = app.listen(process.env.PORT || 3000, function () {
+  logger.api.info(`Server listening on port ${server.address().port}`);
+  console.log(`Server listening on port ${server.address().port}`);
 });
+
+var io = require('socket.io')(server);
 
 //Add services of socket.io
 require('./socket.io')(io);
