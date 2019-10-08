@@ -1,4 +1,5 @@
 var EVENTS = require('../common/constant').CONSTANTS.SOCKET_EVENTS;
+var { logger } = require('../utility/logger');
 
 var chatSocket = function (io) {
 
@@ -6,16 +7,20 @@ var chatSocket = function (io) {
     var listUserActived = [];
 
     io.on(EVENTS.BASE.CONNECTION, (socket) => {
+
+        //log when create connection socketio
+        logger.socketIo.info('Create SocketIO Connection Successful.');
+        
         var listRooms = [];
 
         //---Event registration area---
         //Connection event handle
         socket.on(EVENTS.INIT.INIT_CONNECTION, function (userInfo) {
             listUserActived.push(userInfo.username);
-                socket.UserName = userInfo.username;
-                socket.emit(EVENTS.INIT.INIT_CONNECTION_SUCCESS, { username: userInfo.username });
+            socket.UserName = userInfo.username;
+            socket.emit(EVENTS.INIT.INIT_CONNECTION_SUCCESS, { username: userInfo.username });
 
-                io.sockets.emit(EVENTS.SERVER_RESPONSE_LISTUSERS, listUserActived);
+            io.sockets.emit(EVENTS.SERVER_RESPONSE_LISTUSERS, listUserActived);
         });
 
         //Event user is typing
@@ -53,8 +58,7 @@ var chatSocket = function (io) {
         //LIST EVENT IN ROOM
         //Event send message in Room
         socket.on(EVENTS.CLIENT_SENDMESSAGE_ROOM, function (message) {
-            console.log(io.sockets.adapter.rooms);
-            io.sockets.in(socket.Phong).emit(EVENTS.SERVER_SENDMESSAGE_ROOM, {
+            io.sockets.in(socket.RoomName).emit(EVENTS.SERVER_SENDMESSAGE_ROOM, {
                 username: socket.UserName,
                 message: message.message
             });
@@ -63,14 +67,14 @@ var chatSocket = function (io) {
         //Event user is typing in Room
         socket.on(EVENTS.TYPING_MESSAGE_IN_ROOM, function () {
             var istyping = socket.UserName + EVENTS.IS_TYPING;
-            socket.broadcast.in(socket.Phong).emit(EVENTS.TYPING_MESSAGE, istyping);
+            socket.broadcast.in(socket.RoomName).emit(EVENTS.TYPING_MESSAGE, istyping);
         });
 
         //EVENT FROM JOIN/LEAVE ROOM
         //Event join room
         socket.on(EVENTS.JOIN_ROOM, function (data) {
             socket.join(data);
-            socket.Phong = data;
+            socket.RoomName = data;
 
             if (!listRooms.includes(data)) {
                 listRooms.push(data);
@@ -93,6 +97,10 @@ var chatSocket = function (io) {
 
         //Event handle disconnect when user disconnected
         socket.on(EVENTS.BASE.DISCONNECTED, () => {
+
+            //log when user disconnected
+            logger.socketIo.info('Disconnected Socket IO.');
+
             listUserActived.splice(
                 listUserActived.indexOf(socket.UserName), 1
             );
