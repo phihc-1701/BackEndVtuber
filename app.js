@@ -8,14 +8,11 @@ var express = require('express'),
 var { logger } = require('./utility/logger');
 require('dotenv').config();
 
-//check production or develop mode
+//Check production or develop mode
 var isProduction = process.env.NODE_ENV === 'production';
 
 // Create global app object uss express framework
 var app = express();
-// version express 4.x no need require('http')
-//var server = require('http').Server(app);
-
 
 //Enable cross-origin resource sharing (CORS) with various options.
 app.use(cors());
@@ -48,6 +45,7 @@ require('./models');
 //Require passport authentication
 require('./config/passport');
 
+//Require route controller api
 app.use(require('./routes'));
 
 // catch 404 and forward to error handler
@@ -94,6 +92,8 @@ let server = app.listen(process.env.PORT || 3000, function () {
   console.log(`Server listening on port ${server.address().port}`);
 });
 
+// version express 4.x no need require('http')
+//var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
 //Add services of socket.io
