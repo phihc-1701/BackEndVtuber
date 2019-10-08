@@ -10,10 +10,10 @@ var chatSocket = function (io) {
 
         //---Event registration area---
         //Connection event handle
-        socket.on(EVENTS.INIT.INIT_CONNECTION, function (userInfo) {
+        socket.on(EVENTS.INIT.REGISTER_USER, function (userInfo) {
             listUserActived.push(userInfo.username);
                 socket.UserName = userInfo.username;
-                socket.emit(EVENTS.INIT.INIT_CONNECTION_SUCCESS, { username: userInfo.username });
+                socket.emit(EVENTS.INIT.REGISTER_USER_SUCCESS, { username: userInfo.username });
         });
 
         //Event user is typing

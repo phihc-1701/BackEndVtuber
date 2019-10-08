@@ -1,6 +1,6 @@
 var socket = io("http://localhost:3000");
 
-socket.on("INIT_CONNECTION_EXIST", function () {
+socket.on("REGISTER_USER_EXIST", function () {
   alert("User has been register !");
 });
 
@@ -11,7 +11,7 @@ socket.on("SERVER_RESPONSE_LISTUSERS", function (data) {
   });
 });
 
-socket.on("INIT_CONNECTION_SUCCESS", function (data) {
+socket.on("REGISTER_USER_SUCCESS", function (data) {
   $("#currentUser").html(data);
   $("#loginForm").hide(2000);
   $("#chatForm").show(1000);
@@ -98,7 +98,7 @@ $(document).ready(function () {
     var role = $('#roles option:selected').text();
     if (role === "User")
       $("#btnCreateRoom").val("Join Room");
-    socket.emit("INIT_CONNECTION", {username: $("#txtUsername").val()});
+    socket.emit("REGISTER_USER", {username: $("#txtUsername").val()});
   });
 
   $("#btnLogout").click(function () {
