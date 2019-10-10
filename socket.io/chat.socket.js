@@ -42,19 +42,19 @@ var chatSocket = function (io) {
 
         //EVENT FOR WEB RTC P2P   
         socket.on(EVENTS.WEB_RTC.CHAT_VOICE, () => {
-            io.sockets.emit(EVENTS.WEB_RTC.CHAT_VOICE);
+            socket.broadcast.emit(EVENTS.WEB_RTC.CHAT_VOICE);
         });
 
         socket.on(EVENTS.WEB_RTC.ADD_CANDIDATE, (event) => {
-            io.sockets.emit(EVENTS.WEB_RTC.ADD_CANDIDATE, event);
+            socket.broadcast.emit(EVENTS.WEB_RTC.ADD_CANDIDATE, event);
         });
 
         socket.on(EVENTS.WEB_RTC.OFFER, (event) => {
-            io.sockets.emit(EVENTS.WEB_RTC.OFFER, event.sdp);
+            socket.broadcast.emit(EVENTS.WEB_RTC.OFFER, event.sdp);
         });
 
         socket.on(EVENTS.WEB_RTC.ANSWER, (event) => {
-            io.sockets.emit(EVENTS.WEB_RTC.ANSWER, event.sdp);
+            socket.broadcast.emit(EVENTS.WEB_RTC.ANSWER, event.sdp);
         });
         // CHAT VOICE   
 

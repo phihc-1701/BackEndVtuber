@@ -122,7 +122,7 @@ $(document).ready(function () {
 
   // ----------CHAT VOICE SOCKET EVENT-------------------
   socket.on("CHAT_VOICE", function () {
-    if (isStreamer) {
+    if (isStreamer) {  
       streamerRtcPeerConnection = new RTCPeerConnection(iceServers);
       streamerRtcPeerConnection.onicecandidate = onIceCandidate;
       streamerRtcPeerConnection.addStream(streamerStream);
