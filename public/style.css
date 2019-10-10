@@ -80,7 +80,8 @@
         border-radius: 25% 10%;
         border: 1px solid #0069d9;
         padding: 5px;
-        background: #0069d9
+        background: #0069d9;
+        color: white;
     }
 
     .message-text-other{
