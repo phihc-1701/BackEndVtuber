@@ -6,24 +6,27 @@ const CONSTANTS = {
         LESBIAN: "Lesbian"
     },
     SOCKET_EVENTS: {
-        BASE:{
+        BASE: {
             CONNECTION: "connection",
-            DISCONNECTED: "disconnect"
+            DISCONNECTED: "disconnect",
+            DISCONNECTING: "disconnecting",
+            ERROR: "error"
+
         },
-        INIT:{
+        INIT: {
             INIT_CONNECTION: "INIT_CONNECTION",
             INIT_CONNECTION_EXIST: "INIT_CONNECTION_EXIST",
             INIT_CONNECTION_SUCCESS: "INIT_CONNECTION_SUCCESS"
         },
-        CHATTING:{
+        CHATTING: {
             TYPING_MESSAGE: "TYPING_MESSAGE",
             STOP_TYPING_MESSAGE: "STOP_TYPING_MESSAGE",
             SEND_MESSAGE: "SEND_MESSAGE"
         },
-        POSTURE:{
+        POSTURE: {
             SEND_POSTURE: "SEND_POSTURE"
         },
-        
+
         SERVER_RESPONSE_LISTUSERS: "SERVER_RESPONSE_LISTUSERS",
         SERVER_RESPONSE_LISTUSERS: "SERVER_RESPONSE_LISTUSERS",
         SERVER_SENDMESSAGE_ALL: "SERVER_SENDMESSAGE_ALL",
@@ -39,4 +42,3 @@ const CONSTANTS = {
 };
 
 module.exports = { CONSTANTS }
-
