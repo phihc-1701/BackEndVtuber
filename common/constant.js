@@ -6,24 +6,30 @@ const CONSTANTS = {
         LESBIAN: "Lesbian"
     },
     SOCKET_EVENTS: {
-        BASE:{
+        BASE: {
             CONNECTION: "connection",
             DISCONNECTED: "disconnect"
         },
-        INIT:{
+        INIT: {
             REGISTER_USER: "REGISTER_USER",
             REGISTER_USER_EXIST: "REGISTER_USER_EXIST",
             REGISTER_USER_SUCCESS: "REGISTER_USER_SUCCESS"
         },
-        CHATTING:{
+        CHATTING: {
             TYPING_MESSAGE: "TYPING_MESSAGE",
             STOP_TYPING_MESSAGE: "STOP_TYPING_MESSAGE",
             SEND_MESSAGE: "SEND_MESSAGE"
         },
-        POSTURE:{
+        POSTURE: {
             SEND_POSTURE: "SEND_POSTURE"
         },
-        
+        WEB_RTC: {
+            CHAT_VOICE: "CHAT_VOICE",
+            ADD_CANDIDATE: "ADD_CANDIDATE",
+            OFFER: "OFFER",
+            ANSWER: "ANSWER"
+        },
+
         SERVER_RESPONSE_LISTUSERS: "SERVER_RESPONSE_LISTUSERS",
         SERVER_RESPONSE_LISTUSERS: "SERVER_RESPONSE_LISTUSERS",
         SERVER_SENDMESSAGE_ALL: "SERVER_SENDMESSAGE_ALL",
