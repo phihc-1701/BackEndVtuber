@@ -86,7 +86,13 @@ $(document).ready(function () {
   });
 
   socket.on("SEND_MESSAGE", function (data) {
-    $listMessages.append("<div class='ms'>" + data.username + ":" + data.message + "</div>");
+    if(data.username == $txtUsername.val())
+    {
+      $listMessages.append("<div class='message-area' style= 'text-align: left'> <span class = 'message-text-self'>"  + data.message + "</span></div>");
+    }
+    else{
+      $listMessages.append("<div class='message-area' style= 'text-align: right'> <span class = 'message-text-other'>" + "<span style='color: #f39c12'>"+ data.username +"</span>" + ": " + data.message + "</span> </div>");
+    }
   });
 
   socket.on("TYPING_MESSAGE", function (data) {
@@ -165,7 +171,6 @@ $(document).ready(function () {
   var $postureMessage = $("#postureMessage")
 
   var $btnSendMessage = $("#btnSendMessage");
-  var $btnChatVoice = $("#btnChatVoice");
 
   var $btnAutoSendPosture = $("#btnAutoSendPosture");
   var $btnStopPosture = $("#btnStopPosture");
@@ -182,7 +187,6 @@ $(document).ready(function () {
     if (validateUserName()) {
       $divChatRoom.show();
       $divRegisterUser.hide();
-      $btnChatVoice.hide()
       $lblCurrentUser.text("streamer: " + $txtUsername.val());
       $audioViewer.hide();
       socket.emit("REGISTER_USER", { username: $txtUsername.val(), role: "Streamer" });
@@ -200,6 +204,7 @@ $(document).ready(function () {
       $audioStreamer.hide();
       socket.emit("REGISTER_USER", { username: $txtUsername.val(), role: "Viewer" });
       isStreamer = false;
+      socket.emit('CHAT_VOICE');
     }
   });
 
@@ -230,6 +235,7 @@ $(document).ready(function () {
     sendMessageAll();
   });
 
+  var interval;
   $btnAutoSendPosture.click(function () {
     var posture = {
       "roomID": 123,
@@ -248,8 +254,7 @@ $(document).ready(function () {
         "mount": []
       }
     };
-
-      var interval;
+          
     interval = setInterval(function () {
       $postureMessage.append("<div class='ms'>" + "Client start emit " + getCurrentTime() + "</div>");
       console.log("send posture" + getCurrentTime());
@@ -260,10 +265,6 @@ $(document).ready(function () {
 
   $btnStopPosture.click(function () {
     clearInterval(interval);
-  });
-
-  $btnChatVoice.click(function () {
-    socket.emit('CHAT_VOICE');
   });
 
   const sendMessageAll = () => {

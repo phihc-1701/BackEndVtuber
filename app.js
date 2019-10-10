@@ -37,7 +37,7 @@ if (!isProduction) {
 }
 
 //Connect mongodb
-mongoose.connect(process.env.MONGODB_URI);
+//mongoose.connect(process.env.MONGODB_URI);
 
 //Require models scheme mongoose
 require('./models');

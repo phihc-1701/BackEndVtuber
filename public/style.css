@@ -73,3 +73,19 @@
         background-color: #c0392b !important;
     }
 
+    .message-area{
+        margin-bottom: 10px;
+    }
+    .message-text-self{
+        border-radius: 25% 10%;
+        border: 1px solid #0069d9;
+        padding: 5px;
+        background: #0069d9
+    }
+
+    .message-text-other{
+        border-radius: 25% 10%;
+        border: 1px solid #BEC3C9;
+        padding: 5px;
+        background: #BEC3C9
+    }
