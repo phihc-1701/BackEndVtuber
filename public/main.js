@@ -3,75 +3,21 @@
 $(document).ready(function () {
   var socket = io("http://localhost:3000");
 
-  // CHAT VOICE VARIABLE START
-  var isStreamer;
-  var streamerStream;
+  var janusServer = "http://127.0.0.1" + ":8088/janus";
 
-  var streamerRtcPeerConnection;
-  var viewerRtcPeerConnection;
+  var janus = null;
+  var audioBridgePlugin = null;
+  var opaqueId = "audioBridge-" + Janus.randomString(12);
 
-  var iceServers = {
-    'iceServers': [
-      { 'url': 'stun:stun.services.mozilla.com' },
-      { 'url': 'stun:stun.l.google.com:19302' }
-    ]
-  }
+  var defaultRoom = 1234;
+  var webrtcUp = false;
 
-  var streamConstrains = window.constraints = {
-    audio: true,
-    video: false
-  };
-  // CHAT VOICE VARIABLE END
-
-  // CHAT VOICE FUNCTION START
-  function getStreamerMediaSuccess(stream) {
-    const audioTracks = stream.getAudioTracks();
-    console.log('Got stream with constraints:', constraints);
-    console.log('Using audio device: ' + audioTracks[0].label);
-    stream.oninactive = function () {
-      console.log('Stream ended');
-    };
-    streamerStream = stream;
-    document.getElementById("streamer-audio").srcObject = stream;
-  }
-
-  function handleStreamerMediaError(error) {
-    console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-  }
-
-  function viewOnAddStream(event) {
-    remoteStream = event.stream;
-    document.getElementById("viewer-audio").srcObject = event.stream;
-  }
-
-  function onIceCandidate(event) {
-    if (event.candidate) {
-      console.log('send ice candidate');
-      socket.emit('ADD_CANDIDATE', {
-        type: 'candidate',
-        label: event.candidate.sdpMLineIndex,
-        id: event.candidate.sdpMid,
-        candidate: event.candidate.candidate
-      });
+  Janus.init({
+    debug: "all", callback: function () {
+      janusInit();
     }
-  }
+  });
 
-  function setStreamerLocalAndOffer(sessionDescription) {
-    console.log(sessionDescription);
-    streamerRtcPeerConnection.setLocalDescription(sessionDescription);
-    socket.emit('OFFER', {
-      type: 'offer',
-      sdp: sessionDescription
-    });
-  }
-
-  function setViewerLocalAndAnswer(sessionDescription) {
-    viewerRtcPeerConnection.setLocalDescription(sessionDescription);
-    socket.emit('ANSWER', {
-      type: 'answer',
-      sdp: sessionDescription
-    });
-  }
   // CHAT VOICE FUNCTION END
 
   //SOCKET EVENT
@@ -81,17 +27,16 @@ $(document).ready(function () {
 
   socket.on("REGISTER_USER_SUCCESS", function (data) {
     if (isStreamer) {
-      navigator.mediaDevices.getUserMedia(streamConstrains).then(getStreamerMediaSuccess).catch(handleStreamerMediaError);
+      console.log("REGISTER_USER_SUCCESS");
     }
   });
 
   socket.on("SEND_MESSAGE", function (data) {
-    if(data.username == $txtUsername.val())
-    {
-      $listMessages.append("<div class='message-area' style= 'text-align: left'> <span class = 'message-text-self'>"  + data.message + "</span></div>");
+    if (data.username == $txtUsername.val()) {
+      $listMessages.append("<div class='message-area' style= 'text-align: left'> <span class = 'message-text-self'>" + data.message + "</span></div>");
     }
-    else{
-      $listMessages.append("<div class='message-area' style= 'text-align: right'> <span class = 'message-text-other'>" + "<span style='color: #f39c12'>"+ data.username +"</span>" + ": " + data.message + "</span> </div>");
+    else {
+      $listMessages.append("<div class='message-area' style= 'text-align: right'> <span class = 'message-text-other'>" + "<span style='color: #f39c12'>" + data.username + "</span>" + ": " + data.message + "</span> </div>");
     }
   });
 
@@ -120,50 +65,9 @@ $(document).ready(function () {
     $("#listMessages").append("<div class='ms'>" + 'Attempt to reconnect has failed' + "</div>");
   });
 
-  // ----------CHAT VOICE SOCKET EVENT-------------------
-  socket.on("CHAT_VOICE", function () {
-    if (isStreamer) {  
-      streamerRtcPeerConnection = new RTCPeerConnection(iceServers);
-      streamerRtcPeerConnection.onicecandidate = onIceCandidate;
-      streamerRtcPeerConnection.addStream(streamerStream);
-      streamerRtcPeerConnection.createOffer(setStreamerLocalAndOffer, function (e) { console.log(e) })
-    }
-  });
-
-  socket.on('OFFER', (event) => {
-    if (!isStreamer) {
-      viewerRtcPeerConnection = new RTCPeerConnection(iceServers);
-      viewerRtcPeerConnection.onicecandidate = onIceCandidate;
-      viewerRtcPeerConnection.onaddstream = viewOnAddStream;
-      viewerRtcPeerConnection.setRemoteDescription(new RTCSessionDescription(event));
-      viewerRtcPeerConnection.createAnswer(setViewerLocalAndAnswer, function (e) { console.log(e) })
-    }
-  });
-
-  socket.on('ANSWER', (event) => {
-    if (isStreamer) {
-      streamerRtcPeerConnection.setRemoteDescription(new RTCSessionDescription(event));
-    }
-  });
-
-  socket.on('ADD_CANDIDATE', (event) => {
-    var candidate = new RTCIceCandidate({
-      sdpMLineIndex: event.label,
-      candidate: event.candidate
-    });
-    if (isStreamer) {
-      streamerRtcPeerConnection.addIceCandidate(candidate);
-    }
-    else {
-      viewerRtcPeerConnection.addIceCandidate(candidate);
-    }
-  });
 
   // EVENT ON PAGE
-  var $audioStreamer = $("#streamer-audio");
   var $audioViewer = $("#viewer-audio");
-  
-
   var $btnStreamer = $("#btnStreamer");
   var $btnViewer = $("#btnViewer");
 
@@ -191,6 +95,9 @@ $(document).ready(function () {
       $audioViewer.hide();
       socket.emit("REGISTER_USER", { username: $txtUsername.val(), role: "Streamer" });
       isStreamer = true;
+
+      var register = { "request": "join", "room": defaultRoom, "display": $txtUsername.val() };
+      audioBridgePlugin.send({ "message": register });
     }
   });
 
@@ -201,10 +108,10 @@ $(document).ready(function () {
       $btnAutoSendPosture.hide();
       $btnStopPosture.hide();
       $lblCurrentUser.text("viewer: " + $txtUsername.val());
-      $audioStreamer.hide();
       socket.emit("REGISTER_USER", { username: $txtUsername.val(), role: "Viewer" });
       isStreamer = false;
-      socket.emit('CHAT_VOICE');
+      var register = { "request": "join", "room": defaultRoom, "display": $txtUsername.val() };
+      audioBridgePlugin.send({ "message": register });
     }
   });
 
@@ -254,7 +161,7 @@ $(document).ready(function () {
         "mount": []
       }
     };
-          
+
     interval = setInterval(function () {
       $postureMessage.append("<div class='ms'>" + "Client start emit " + getCurrentTime() + "</div>");
       console.log("send posture" + getCurrentTime());
@@ -277,6 +184,112 @@ $(document).ready(function () {
     var today = new Date();
     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     return ' ' + time;
+  }
+
+  function janusInit() {
+    janus = new Janus(
+      {
+        server: janusServer,
+        success: function () {
+          janus.attach(
+            {
+              plugin: "janus.plugin.audiobridge",
+              opaqueId: opaqueId,
+              success: function (pluginHandle) {
+                audioBridgePlugin = pluginHandle;
+                Janus.log("Plugin attached! (" + audioBridgePlugin.getPlugin() + ", id=" + audioBridgePlugin.getId() + ")");
+              },
+              error: function (error) {
+                Janus.error("  -- Error attaching plugin...", error);
+                alert("Error attaching plugin... " + error);
+              },
+              consentDialog: function (on) {
+              },
+              onmessage: function (msg, jsep) {
+                Janus.debug(" ::: Got a message :::");
+                Janus.debug(msg);
+                var event = msg["audiobridge"];
+                Janus.debug("Event: " + event);
+                if (event != undefined && event != null) {
+                  if (event === "joined") {
+                    if (msg["id"]) {
+                      Janus.log("Successfully joined room " + msg["room"] + " with ID " + msg["id"]);
+                      if (!webrtcUp) {
+                        webrtcUp = true;
+
+                        var audioConfig;
+                        if(isStreamer){
+                          audioConfig = { video: false, audioSend: true }
+                        }
+                        else{
+                          audioConfig = { video: false, audioSend: false }
+                        }
+                        
+                        audioBridgePlugin.createOffer(
+                          {
+                            media: audioConfig,	// This is an audio only room
+                            success: function (jsep) {
+                              Janus.debug("Got SDP!");
+                              Janus.debug(jsep);
+                              var publish = { "request": "configure", "muted": false };
+                              audioBridgePlugin.send({ "message": publish, "jsep": jsep });
+                            },
+                            error: function (error) {
+                              Janus.error("WebRTC error:", error);
+                              alert("WebRTC error... " + JSON.stringify(error));
+                            }
+                          });
+                      }
+                    }
+                    if (msg["participants"] !== undefined && msg["participants"] !== null) {
+
+                    }
+                  } else if (event === "roomchanged") {
+
+                  } else if (event === "destroyed") {
+
+                  } else if (event === "event") {
+                    if (msg["participants"] !== undefined && msg["participants"] !== null) {
+
+                    } else if (msg["error"] !== undefined && msg["error"] !== null) {
+
+                    }
+                    if (msg["leaving"] !== undefined && msg["leaving"] !== null) {
+                    }
+                  }
+                }
+                if (jsep !== undefined && jsep !== null) {
+                  Janus.debug("Handling SDP as well...");
+                  Janus.debug(jsep);
+                  audioBridgePlugin.handleRemoteJsep({ jsep: jsep });
+                }
+              },
+              onlocalstream: function (stream) {
+                Janus.debug(" ::: Got a local stream :::");
+                Janus.debug(stream);
+              },
+              onremotestream: function (stream) {
+                if (!isStreamer) {
+                  console.log("us");
+                  Janus.attachMediaStream($audioViewer.get(0), stream);
+                }
+              },
+              oncleanup: function () {
+                webrtcUp = false;
+                Janus.log(" ::: Got a cleanup notification :::");
+              }
+            });
+        },
+        error: function (error) {
+          Janus.error(error);
+          alert(error, function () {
+            window.location.reload();
+          });
+        },
+        destroyed: function () {
+          window.location.reload();
+        }
+      });
   }
 
 });

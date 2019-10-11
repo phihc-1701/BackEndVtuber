@@ -12,6 +12,9 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="main.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/6.4.0/adapter.min.js" ></script>
+    <script type="text/javascript" src="janus.js" ></script>
 </head>
 
 <body>
@@ -64,8 +67,7 @@
                     <span id="notification" style="display: block"></span><br />
                     <input type="text" id="txtMessage" style="width: 40%" />
                     <input type="button" class="btn btn-primary" id="btnSendMessage" value="Send Chat"
-                        style="margin-left: 5px" />
-                    <audio id="streamer-audio" controls autoplay style="margin-left: 5px; width: 200px;"></audio>
+                        style="margin-left: 5px" />         
                     <audio id="viewer-audio" controls autoplay style="margin-left: 5px; width: 200px;"></audio>
                 </div>
             </div>
