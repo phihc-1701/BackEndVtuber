@@ -59,8 +59,20 @@ var chatSocket = function (io) {
         // CHAT VOICE   
 
         //Event handle disconnect when user disconnected
-        socket.on(EVENTS.BASE.DISCONNECTED, () => {
+        socket.on("connect_error", (event) => {
+            console.log(event);
+        });
 
+        socket.on("connect_error", (event) => {
+            console.log(event);
+        });
+
+        socket.on("error", (event) => {
+            console.log(event);
+        });
+
+        socket.on("reconnect_error", (event) => {
+            console.log(event);
         });
     });
 }
