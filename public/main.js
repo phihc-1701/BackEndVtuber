@@ -1,9 +1,8 @@
 
 
 $(document).ready(function () {
-  var socket = io("http://127.0.0.1:3000");
-
-  var janusServer = "http://127.0.0.1" + ":8088/janus";
+  var socket = io("http://"+ window.location.hostname +":3000");
+  var janusServer = "http://"+ window.location.hostname + ":8088/janus";
 
   var janus = null;
   var audioBridgePlugin = null;
