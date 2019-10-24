@@ -1,0 +1,8 @@
+  apps : [{
+    name: "prod_deployjanus",
+    script: "./app.js",
+    watch: true,
+    instances: "1",
+    exec_mode: cluster,
+  }]
+ 
