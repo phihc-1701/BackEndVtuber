@@ -8,7 +8,9 @@ const CONSTANTS = {
     SOCKET_EVENTS: {
         BASE: {
             CONNECTION: "connection",
-            DISCONNECTED: "disconnect"
+            DISCONNECTED: "disconnect",
+            DISCONNECTING: "disconnecting",
+            ERROR: "error"
         },
         INIT: {
             REGISTER_USER: "REGISTER_USER",
@@ -41,8 +43,8 @@ const CONSTANTS = {
         CURRENT_ROOM: "CURRENT_ROOM",
         LOGOUT: "LOGOUT",
         IS_TYPING: " is typing...",
+        RECONNECT: "reconnect",
     }
 };
 
 module.exports = { CONSTANTS }
-

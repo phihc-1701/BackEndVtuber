@@ -1,30 +1,35 @@
 var EVENTS = require('../common/constant').CONSTANTS.SOCKET_EVENTS;
-
-var chatSocket = function (io) {
-
+var { logger } = require('../utility/logger');
+var chatSocket = function(io) {
     io.on(EVENTS.BASE.CONNECTION, (socket) => {
+
+        logger.socketIo.info('Create SocketIO Connection Successful.');
+
         //---Event registration area---
         //Connection event handle
-        socket.on(EVENTS.INIT.REGISTER_USER, function (userInfo) {
+        socket.on(EVENTS.INIT.REGISTER_USER, function(userInfo) {
             socket.UserName = userInfo.username;
             socket.Role = userInfo.role;
+
+            let messageLog = userInfo.mode == EVENTS.RECONNECT ? ' has been reconnected with role: ' : ' has been connected with role: ';
+            logger.socketIo.info(socket.UserName + messageLog + socket.Role);
             socket.emit(EVENTS.INIT.REGISTER_USER_SUCCESS, { username: userInfo.username });
         });
 
         //Event user is typing
-        socket.on(EVENTS.CHATTING.TYPING_MESSAGE, function () {
+        socket.on(EVENTS.CHATTING.TYPING_MESSAGE, function() {
             var whoTyping = socket.UserName + EVENTS.IS_TYPING;
             socket.broadcast.emit(EVENTS.CHATTING.TYPING_MESSAGE, { typing: whoTyping });
         });
 
         //Event user is stopping type
-        socket.on(EVENTS.CHATTING.STOP_TYPING_MESSAGE, function () {
+        socket.on(EVENTS.CHATTING.STOP_TYPING_MESSAGE, function() {
             var whoStopTyping = socket.UserName + " stop" + EVENTS.IS_TYPING;
             socket.broadcast.emit(EVENTS.CHATTING.STOP_TYPING_MESSAGE, { stopTyping: whoStopTyping });
         });
 
         // Event send message all
-        socket.on(EVENTS.CHATTING.SEND_MESSAGE, function (message) {
+        socket.on(EVENTS.CHATTING.SEND_MESSAGE, function(message) {
             io.sockets.emit(EVENTS.CHATTING.SEND_MESSAGE, {
                 username: socket.UserName,
                 message: message.message,
@@ -58,27 +63,32 @@ var chatSocket = function (io) {
         });
         // CHAT VOICE   
 
+        //EVENT HANDLE DISCONNECT   
         //Event handle disconnect when user disconnected
-        socket.on("connect_error", (event) => {
-            console.log(event);
+        socket.on(EVENTS.BASE.DISCONNECTED, function(reason) {
+
+            //log when user disconnected
+            logger.socketIo.info(socket.UserName + ' was disconnected Socket IO with reason: ' + reason);
         });
 
-        socket.on("connect_error", (event) => {
-            console.log(event);
+        //Event handle disconnect when user disconnecting.
+        socket.on(EVENTS.BASE.DISCONNECTING, (reason) => {
+
+            //log when user disconnecting
+            logger.socketIo.info(socket.UserName + ' is disconnecting with reason: ' + reason);
         });
 
-        socket.on("error", (event) => {
-            console.log(event);
-        });
+        //Event handle when connection error.
+        socket.on(EVENTS.BASE.ERROR, function(error) {
 
-        socket.on("reconnect_error", (event) => {
-            console.log(event);
-        });
+            //log when connection error
+            logger.socketIo.info(socket.UserName + 'error: ' + error);
+        })
     });
 }
 
 //UTILITIES FUNCTION
-var getCurrentTime = function () {
+var getCurrentTime = function() {
     var today = new Date();
     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     return time;
