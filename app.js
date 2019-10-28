@@ -95,7 +95,6 @@ let server = app.listen(process.env.PORT || 3000, function () {
 // version express 4.x no need require('http')
 //var server = require('http').Server(app);
 var io = require('socket.io')(server);
-//io.set( 'origins', '*' );
 //Add services of socket.io
 require('./socket.io')(io);
 
