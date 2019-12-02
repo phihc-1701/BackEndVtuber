@@ -84,17 +84,22 @@ $(document).ready(function() {
 
     var $txtUsername = $("#txtUsername");
     var $txtMessage = $("#txtMessage");
+    var $txtRoomName = $("#txtRoomName");
 
     var $divChatRoom = $("#chatRoom");
     var $divRegisterUser = $("#registerUser");
+    var $divListRoom = $("#rooms");
     var $lblCurrentUser = $("#currentUser");
 
+    var $btnJoinRoom = $("#btnJoinRoom");
+    var $btnLeaveRoom = $("#btnLeaveRoom");
 
     $btnStreamer.click(function() {
         if (validateUserName()) {
-            $divChatRoom.show();
+            $divListRoom.show();
             $divRegisterUser.hide();
             $lblCurrentUser.text("streamer: " + $txtUsername.val());
+            countRooms();
             $audioViewer.hide();
             socket.emit("REGISTER_USER", { username: $txtUsername.val(), role: "Streamer" });
             isStreamer = true;
@@ -106,16 +111,45 @@ $(document).ready(function() {
 
     $btnViewer.click(function() {
         if (validateUserName()) {
-            $divChatRoom.show();
+            $divListRoom.show();
             $divRegisterUser.hide();
             $btnAutoSendPosture.hide();
             $btnStopPosture.hide();
             $lblCurrentUser.text("viewer: " + $txtUsername.val());
+            countRooms();
             socket.emit("REGISTER_USER", { username: $txtUsername.val(), role: "Viewer" });
             isStreamer = false;
             var register = { "request": "join", "room": defaultRoom, "display": $txtUsername.val() };
             audioBridgePlugin.send({ "message": register });
         }
+    });
+
+    //Namespace rooms
+    const socketroom = io('/rooms', { transports: ['websocket'] });
+
+    // When socket connects, get a list of chatrooms
+    socketroom.on('connect', function() {
+
+        let listRooms = "";
+        $btnJoinRoom.click(function() {
+            if (!validateRoomName())
+                return;
+
+            socketroom.emit("JOIN_ROOM", { roomname: $txtRoomName.val() });
+        });
+
+        socketroom.on("JOIN_ROOM_SUCCESS", function(data) {
+            listRooms = data.listRoom;
+
+            displayListRooms(listRooms);
+            countRooms();
+        });
+
+    });
+
+    $btnLeaveRoom.click(function() {
+        $divListRoom.hide();
+        $divRegisterUser.show();
     });
 
     function validateUserName() {
@@ -176,6 +210,28 @@ $(document).ready(function() {
     $btnStopPosture.click(function() {
         clearInterval(interval);
     });
+
+    const countRooms = () => {
+        $(".countRooms").text($('.room-item').length);
+    }
+
+    function displayListRooms(listRooms) {
+        let lstRoomHtml = "";
+        jQuery.each(listRooms, function(i, val) {
+            lstRoomHtml += "<div class='room-item'>" + val + "</div>";
+        });
+        $('.room-list').html(lstRoomHtml);
+    }
+
+    function validateRoomName() {
+        if ($txtRoomName.val() === "") {
+            alert('Please input Room Name !!');
+
+            return false;
+        }
+
+        return true;
+    }
 
     const sendMessageAll = () => {
         var message = $txtMessage.val().trim();
@@ -288,5 +344,4 @@ $(document).ready(function() {
             }
         });
     }
-
 });

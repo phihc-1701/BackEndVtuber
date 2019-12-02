@@ -1,6 +1,26 @@
 var EVENTS = require('../common/constant').CONSTANTS.SOCKET_EVENTS;
 var { logger } = require('../utility/logger');
 var chatSocket = function(io) {
+
+    // Rooms namespace
+    io.of('/rooms').on(EVENTS.BASE.CONNECTION, (socket) => {
+
+        var listRoom = [];
+        // Create a new room
+        socket.on('JOIN_ROOM', (roomInfo) => {
+
+            if (!listRoom.includes(roomInfo.roomname)) {
+                listRoom.push(roomInfo.roomname);
+                socket.join(roomInfo.roomname);
+
+                var abc = io.sockets.adapter.rooms;
+                console.log(abc);
+            }
+
+            socket.emit("JOIN_ROOM_SUCCESS", { listRoom: listRoom })
+        });
+    });
+
     io.on(EVENTS.BASE.CONNECTION, (socket) => {
 
         logger.socketIo.info('Create SocketIO Connection Successful.');
@@ -84,6 +104,8 @@ var chatSocket = function(io) {
             //log when connection error
             logger.socketIo.info(socket.UserName + 'error: ' + error);
         })
+
+        //Event ROOMS
     });
 }
 
