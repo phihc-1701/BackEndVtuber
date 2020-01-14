@@ -63,6 +63,7 @@ var chatSocket = function(io) {
                 postureData: data,
                 currentTime: getCurrentTime()
             });
+
         });
 
         //EVENT FOR WEB RTC P2P   
