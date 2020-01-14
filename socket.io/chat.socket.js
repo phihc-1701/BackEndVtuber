@@ -62,6 +62,7 @@ var chatSocket = function(io) {
             io.sockets.emit(EVENTS.POSTURE.SEND_POSTURE, {
                 postureData: data,
                 currentTime: getCurrentTime()
+
             });
 
         });
